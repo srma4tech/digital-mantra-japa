@@ -1,8 +1,8 @@
 /**
  * ui.js
  * -------------------------------------------------
- * Responsible ONLY for rendering UI
- * No business logic, no timers, no counters
+ * UI rendering only
+ * No business logic
  */
 
 import { state, persistState } from './state.js';
@@ -12,12 +12,12 @@ import { toggleTheme } from './utils.js';
 import { stopAndRecordSession } from './timer.js';
 
 /* =================================================
-   CIRCLE GEOMETRY (SINGLE SOURCE OF TRUTH)
+   CIRCLE GEOMETRY (LOCKED)
 ================================================= */
 
+const VIEWBOX = 240;
 const RADIUS = 104;
 const STROKE = 12;
-const VIEWBOX = 240;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 /* =================================================
@@ -30,7 +30,7 @@ export function renderUI() {
 }
 
 /* =================================================
-   TAP AREA (CIRCLE)
+   TAP AREA (PROGRESS CIRCLE)
 ================================================= */
 
 function renderTapArea() {
@@ -47,7 +47,6 @@ function renderTapArea() {
         min-w-[260px] min-h-[260px]
       "
     >
-      <!-- Progress Ring -->
       <svg
         viewBox="0 0 ${VIEWBOX} ${VIEWBOX}"
         class="w-full h-full -rotate-90"
@@ -118,32 +117,24 @@ function renderControls() {
   document.getElementById('controls').innerHTML = `
     <div class="space-y-4 text-sm opacity-90">
 
-      <!-- Mantra -->
-      <select id="mantraSelect"
-        class="w-full p-2 rounded border">
+      <select id="mantraSelect" class="w-full p-2 rounded border">
         ${mantras.map(m =>
           `<option ${m === state.mantra ? 'selected' : ''}>${m}</option>`
         ).join('')}
         <option value="__custom">+ Add Custom Mantra</option>
       </select>
 
-      <!-- Mala Goal -->
-      <select id="malaGoalSelect"
-        class="w-full p-2 rounded border">
+      <select id="malaGoalSelect" class="w-full p-2 rounded border">
         ${[11, 21, 54, 108].map(n =>
-          `<option ${n === state.malaGoal ? 'selected' : ''}>
-            ${n} beads
-          </option>`
+          `<option ${n === state.malaGoal ? 'selected' : ''}>${n} beads</option>`
         ).join('')}
       </select>
 
-      <!-- Lifetime -->
       <div class="flex justify-between opacity-80">
         <span>Lifetime Japa</span>
         <span>${state.lifetime}</span>
       </div>
 
-      <!-- Actions -->
       <div class="flex flex-col sm:flex-row gap-3">
         <button id="lockBtn"
           class="flex-1 py-2 rounded bg-wood text-white opacity-90">
@@ -156,13 +147,11 @@ function renderControls() {
         </button>
       </div>
 
-      <!-- Utilities -->
       <div class="flex justify-between text-xs opacity-70">
         <button id="themeBtn" class="underline">Night Mode</button>
         <button id="statsToggle" class="underline">Stats</button>
       </div>
 
-      <!-- Stats -->
       <div id="statsPanel"
         class="hidden border-t pt-3 space-y-2">
         ${renderStats(stats)}
