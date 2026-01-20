@@ -1,0 +1,118 @@
+/* =========================================================
+   THEME VARIABLES
+========================================================= */
+
+/* -------- DAY MODE -------- */
+:root {
+  --bg-gradient: radial-gradient(
+    circle at top,
+    #FFF6C3 0%,
+    #FDE68A 55%,
+    #FACC15 100%
+  );
+
+  --text-primary: #78350F;
+  --text-secondary: rgba(120, 53, 15, 0.6);
+
+  --ring-track: #E5E7EB;
+  --ring-progress: #D97706;
+
+  --surface-bg: rgba(255, 255, 255, 0.65);
+  --surface-border: rgba(120, 53, 15, 0.2);
+}
+
+/* -------- DARK MODE (CALM & WARM) -------- */
+.dark {
+  --bg-gradient: radial-gradient(
+    circle at top,
+    #2B241E 0%,
+    #1E1915 55%,
+    #141210 100%
+  );
+
+  --text-primary: #F5E9C8;
+  --text-secondary: rgba(245, 233, 200, 0.6);
+
+  /* Softer ring tones */
+  --ring-track: rgba(245, 233, 200, 0.35);
+  --ring-progress: #F59E0B;
+
+  --surface-bg: rgba(28, 24, 21, 0.85);
+  --surface-border: rgba(245, 233, 200, 0.25);
+}
+
+/* =========================================================
+   GLOBAL BASE
+========================================================= */
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  transition: background 0.4s ease, color 0.3s ease;
+  touch-action: manipulation;
+}
+
+/* =========================================================
+   MEDITATION CANVAS
+========================================================= */
+
+#tapArea {
+  display: grid;
+  place-items: center;
+}
+
+/* =========================================================
+   PROGRESS RING POLISH
+========================================================= */
+
+svg circle {
+  transition: stroke 0.3s ease;
+}
+
+.dark svg circle:last-child {
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.35));
+}
+
+/* =========================================================
+   CONTROLS PANEL
+========================================================= */
+
+#controls {
+  background: var(--surface-bg);
+  border-top: 1px solid var(--surface-border);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+/* =========================================================
+   INPUTS & BUTTONS
+========================================================= */
+
+select,
+button {
+  background-color: transparent;
+  color: inherit;
+  border-color: var(--surface-border);
+}
+
+select {
+  padding: 0.6rem;
+}
+
+button {
+  padding: 0.6rem;
+}
+
+select:focus,
+button:focus {
+  outline: none;
+  border-color: var(--ring-progress);
+}
+
+/* =========================================================
+   TEXT UTILITIES
+========================================================= */
+
+.text-secondary {
+  color: var(--text-secondary);
+}
