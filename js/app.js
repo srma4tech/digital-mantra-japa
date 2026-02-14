@@ -23,6 +23,7 @@ renderUI();
 
 function handleJapaTap() {
   if (state.guideOpen) return;
+  if (state.locked) return;
 
   if (!state.sessionActive) {
     startSessionTimer(timerEl);
@@ -54,8 +55,6 @@ document.addEventListener('click', (event) => {
   }
 
   if (event.target.id === 'resetBtn') {
-    if (state.locked) return;
-
     const confirmed = confirm(
       'Reset current Naam Jap session?\n\n' +
       'Lifetime count will remain safe.'
