@@ -1,12 +1,16 @@
-{
+﻿{
+  "id": "./",
   "name": "Digital Mantra Japa",
   "short_name": "Mantra Japa",
   "description": "Offline Digital Mala for Mantra Japa & Naam Simran",
+  "lang": "en",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#FEF3C7",
   "theme_color": "#78350F",
   "orientation": "portrait",
+  "categories": ["lifestyle", "health", "productivity"],
   "icons": [
     {
       "src": "assets/icons/icon-192.png",

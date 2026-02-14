@@ -1,4 +1,4 @@
-﻿/**
+/**
  * app.js
  * -----------------------------------------
  * Application bootstrap & orchestration
@@ -13,7 +13,6 @@ import { initAnalytics, trackEvent } from './analytics.js';
 
 // Load persisted theme BEFORE render
 loadTheme();
-initAnalytics();
 
 // DOM references
 const tapArea = document.getElementById('tapArea');
@@ -23,11 +22,17 @@ const timerEl = document.getElementById('sessionTimer');
 // Initial render (timer intentionally NOT started)
 renderUI();
 
+function maybeInitAnalytics() {
+  if (!state.analyticsEnabled) return;
+  initAnalytics();
+}
+
 function handleJapaTap() {
   if (state.guideOpen) return;
   if (state.locked) return;
 
   if (!state.sessionActive) {
+    maybeInitAnalytics();
     startSessionTimer(timerEl);
     trackEvent('session_started', {
       mantra: state.mantra,
@@ -53,6 +58,7 @@ tapArea.addEventListener('keydown', (event) => {
    Global Controls
 ---------------------------- */
 document.addEventListener('click', (event) => {
+  maybeInitAnalytics();
 
   if (event.target.id === 'lockBtn') {
     state.locked = !state.locked;

@@ -2,12 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Digital Mantra Japa is a minimalist, distraction-free mala counter for mantra chanting and naam simran with offline support." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#78350F" />
+  <meta name="color-scheme" content="light dark" />
 
-  <title>Digital Mantra Japa</title>
+  <title>Digital Mantra Japa | Offline Mala Counter</title>
+  <link rel="canonical" href="https://srma4tech.github.io/digital-mantra-japa/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Digital Mantra Japa" />
+  <meta property="og:description" content="Offline-friendly digital mala counter for mantra japa and naam simran." />
+  <meta property="og:url" content="https://srma4tech.github.io/digital-mantra-japa/" />
+  <meta property="og:image" content="https://srma4tech.github.io/digital-mantra-japa/assets/icons/icon-512.png" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Digital Mantra Japa" />
+  <meta name="twitter:description" content="Offline-friendly digital mala counter for mantra japa and naam simran." />
+  <meta name="twitter:image" content="https://srma4tech.github.io/digital-mantra-japa/assets/icons/icon-512.png" />
 
   <!-- Tailwind (layout & spacing only) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,11 +31,25 @@
   <!-- PWA -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- Favicon -->
+  <!-- Icons -->
   <link rel="icon" type="image/png" href="./assets/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Digital Mantra Japa",
+      "url": "https://srma4tech.github.io/digital-mantra-japa/",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Any",
+      "description": "Minimalist digital mala counter for mantra chanting and naam simran with offline support."
+    }
+  </script>
 </head>
 
 <body>
+  <a href="#controls" class="skip-link">Skip to controls</a>
 
   <div id="appShell">
     <header class="py-4 text-center">
@@ -32,6 +59,7 @@
       <p
         id="sessionTimer"
         class="text-xs mt-1 text-secondary"
+        aria-live="polite"
       >
         Session: 00:00:00
       </p>
@@ -40,9 +68,7 @@
     <main
       id="tapArea"
       class="select-none px-4"
-      role="button"
-      tabindex="0"
-      aria-label="Tap or press Enter/Space to count one bead"
+      aria-label="Japa counter"
     >
       <!-- Rendered by ui.js -->
     </main>
@@ -60,15 +86,18 @@
     >
       <!-- Rendered by ui.js -->
     </footer>
-
   </div>
 
   <div id="guideModalRoot"></div>
 
+  <noscript>
+    <p class="noscript-note">This app needs JavaScript enabled to work.</p>
+  </noscript>
+
   <audio
     id="bellSound"
     preload="auto"
-    src="./assets/audio/bell.mp3"
+    aria-hidden="true"
   ></audio>
 
   <script>
@@ -88,6 +117,7 @@
       });
     }
   </script>
-
 </body>
 </html>
+
+
