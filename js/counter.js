@@ -4,6 +4,8 @@ import { vibrate, playBell } from './utils.js';
 import { recordMalaCompletion } from './stats.js';
 
 export function incrementJapa(bellSound) {
+  if (state.locked) return;
+
   vibrate(30);
 
   state.beads++;

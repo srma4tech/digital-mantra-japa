@@ -121,19 +121,18 @@ function renderControls() {
   const mantras = getMantras();
   const stats = getAllStats();
   const isDark = document.documentElement.classList.contains('dark');
-  const controlsDisabled = state.locked ? 'disabled' : '';
 
   document.getElementById('controls').innerHTML = `
     <div class="space-y-4 text-sm opacity-90">
 
-      <select id="mantraSelect" class="w-full p-2 rounded border" ${controlsDisabled}>
+      <select id="mantraSelect" class="w-full p-2 rounded border" >
         ${mantras.map(m =>
           `<option ${m === state.mantra ? 'selected' : ''}>${escapeHTML(m)}</option>`
         ).join('')}
         <option value="__custom">+ Add Custom Mantra</option>
       </select>
 
-      <select id="malaGoalSelect" class="w-full p-2 rounded border" ${controlsDisabled}>
+      <select id="malaGoalSelect" class="w-full p-2 rounded border" >
         ${[11, 21, 54, 108].map(n =>
           `<option ${n === state.malaGoal ? 'selected' : ''}>${n} beads</option>`
         ).join('')}
@@ -152,7 +151,7 @@ function renderControls() {
 
         <button id="resetBtn"
           class="flex-1 py-2 rounded border opacity-60 hover:opacity-90"
-          ${controlsDisabled}>
+          >
           Reset
         </button>
       </div>
@@ -201,7 +200,7 @@ function renderGuideModal() {
 
         <div class="guide-section mt-3">
           <h3 class="font-medium">Buttons And Controls</h3>
-          <p class="text-sm opacity-80">Mantra: choose or add custom mantra. Mala goal: 11, 21, 54, or 108. Lock: prevents accidental settings changes. Reset: clears current session beads and malas only. Theme: switch day/night mode. Stats: show mantra-wise time and completed malas. User Guide: reopen this guide anytime.</p>
+          <p class="text-sm opacity-80">Mantra: choose or add custom mantra. Mala goal: 11, 21, 54, or 108. Lock: prevents accidental tap counting. Reset: clears current session beads and malas only. Theme: switch day/night mode. Stats: show mantra-wise time and completed malas. User Guide: reopen this guide anytime.</p>
         </div>
 
         <div class="guide-section mt-3">
@@ -319,7 +318,6 @@ function formatTime(ms) {
 function wireEvents() {
   document.getElementById('mantraSelect')
     .addEventListener('change', e => {
-      if (state.locked) return;
       stopAndRecordSession();
 
       if (e.target.value === '__custom') {
@@ -340,7 +338,6 @@ function wireEvents() {
 
   document.getElementById('malaGoalSelect')
     .addEventListener('change', e => {
-      if (state.locked) return;
       stopAndRecordSession();
       state.malaGoal = Number(e.target.value);
       persistState();
@@ -366,3 +363,4 @@ function wireEvents() {
       renderUI();
     });
 }
+
