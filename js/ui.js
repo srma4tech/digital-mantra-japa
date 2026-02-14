@@ -5,11 +5,17 @@
  * No business logic
  */
 
-import { state, persistState, setGuideDismissed } from './state.js';
+import {
+  state,
+  persistState,
+  setGuideDismissed,
+  setAnalyticsEnabled
+} from './state.js';
 import { getMantras, addMantra } from './mantra.js';
 import { getAllStats } from './stats.js';
 import { toggleTheme } from './utils.js';
 import { stopAndRecordSession } from './timer.js';
+import { initAnalytics, trackEvent } from './analytics.js';
 
 /* =================================================
    CIRCLE GEOMETRY (LOCKED)
@@ -125,14 +131,14 @@ function renderControls() {
   document.getElementById('controls').innerHTML = `
     <div class="space-y-4 text-sm opacity-90">
 
-      <select id="mantraSelect" class="w-full p-2 rounded border" >
+      <select id="mantraSelect" class="w-full p-2 rounded border">
         ${mantras.map(m =>
           `<option ${m === state.mantra ? 'selected' : ''}>${escapeHTML(m)}</option>`
         ).join('')}
         <option value="__custom">+ Add Custom Mantra</option>
       </select>
 
-      <select id="malaGoalSelect" class="w-full p-2 rounded border" >
+      <select id="malaGoalSelect" class="w-full p-2 rounded border">
         ${[11, 21, 54, 108].map(n =>
           `<option ${n === state.malaGoal ? 'selected' : ''}>${n} beads</option>`
         ).join('')}
@@ -150,8 +156,7 @@ function renderControls() {
         </button>
 
         <button id="resetBtn"
-          class="flex-1 py-2 rounded border opacity-60 hover:opacity-90"
-          >
+          class="flex-1 py-2 rounded border opacity-60 hover:opacity-90">
           Reset
         </button>
       </div>
@@ -210,12 +215,17 @@ function renderGuideModal() {
 
         <div class="guide-section mt-3">
           <h3 class="font-medium">Data And Privacy</h3>
-          <p class="text-sm opacity-80">All data stays in your browser local storage. No sign-in, no cloud sync.</p>
+          <p class="text-sm opacity-80">Analytics is optional. Enable the checkbox below only if you want anonymous usage insights in Google Analytics.</p>
         </div>
 
         <label class="guide-checkbox mt-4">
           <input id="guideDismissCheckbox" type="checkbox" />
           <span>Do not show this guide on startup</span>
+        </label>
+
+        <label class="guide-checkbox mt-2">
+          <input id="analyticsOptInCheckbox" type="checkbox" ${state.analyticsEnabled ? 'checked' : ''} />
+          <span>Allow anonymous usage analytics (Google Analytics)</span>
         </label>
 
         <div class="mt-5 flex justify-end">
@@ -230,8 +240,20 @@ function renderGuideModal() {
 
 function closeGuide() {
   const shouldDismiss = document.getElementById('guideDismissCheckbox')?.checked;
+  const analyticsOptIn = document.getElementById('analyticsOptInCheckbox')?.checked;
+
   setGuideDismissed(Boolean(shouldDismiss));
+  setAnalyticsEnabled(Boolean(analyticsOptIn));
+
+  if (analyticsOptIn) {
+    initAnalytics();
+  }
+
   state.guideOpen = false;
+  trackEvent('guide_closed', {
+    dismissed_on_startup: Boolean(shouldDismiss),
+    analytics_enabled: Boolean(analyticsOptIn)
+  });
   renderUI();
 }
 
@@ -326,12 +348,14 @@ function wireEvents() {
           const { mantras, added } = addMantra(input);
           if (added) {
             state.mantra = mantras[mantras.length - 1];
+            trackEvent('mantra_added', { mantra: state.mantra });
           }
         }
       } else {
         state.mantra = e.target.value;
       }
 
+      trackEvent('mantra_changed', { mantra: state.mantra });
       persistState();
       renderUI();
     });
@@ -340,6 +364,7 @@ function wireEvents() {
     .addEventListener('change', e => {
       stopAndRecordSession();
       state.malaGoal = Number(e.target.value);
+      trackEvent('mala_goal_changed', { mala_goal: state.malaGoal });
       persistState();
       renderUI();
     });
@@ -347,12 +372,16 @@ function wireEvents() {
   document.getElementById('themeBtn')
     .addEventListener('click', () => {
       toggleTheme();
+      trackEvent('theme_toggled', {
+        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      });
       renderUI();
     });
 
   document.getElementById('statsToggle')
     .addEventListener('click', () => {
       state.statsOpen = !state.statsOpen;
+      trackEvent('stats_toggled', { open: state.statsOpen });
       renderUI();
     });
 
@@ -360,7 +389,7 @@ function wireEvents() {
     .addEventListener('click', () => {
       setGuideDismissed(false);
       state.guideOpen = true;
+      trackEvent('guide_opened');
       renderUI();
     });
 }
-

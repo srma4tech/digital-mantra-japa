@@ -18,7 +18,8 @@ export const state = {
   sessionStart: null,
   sessionActive: false,
   statsOpen: false,
-  guideOpen: !guideDismissed
+  guideOpen: !guideDismissed,
+  analyticsEnabled: localStorage.getItem('analyticsEnabled') === 'true'
 };
 
 export function persistState() {
@@ -31,6 +32,12 @@ export function persistState() {
 
 export function setGuideDismissed(value) {
   localStorage.setItem('guideDismissed', value ? 'true' : 'false');
+}
+
+export function setAnalyticsEnabled(value) {
+  const enabled = Boolean(value);
+  state.analyticsEnabled = enabled;
+  localStorage.setItem('analyticsEnabled', enabled ? 'true' : 'false');
 }
 
 export function resetSessionState() {
