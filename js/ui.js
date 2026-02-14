@@ -5,7 +5,7 @@
  * No business logic
  */
 
-import { state, persistState } from './state.js';
+import { state, persistState, setGuideDismissed } from './state.js';
 import { getMantras, addMantra } from './mantra.js';
 import { getAllStats } from './stats.js';
 import { toggleTheme } from './utils.js';
@@ -36,6 +36,7 @@ function escapeHTML(value) {
 export function renderUI() {
   renderTapArea();
   renderControls();
+  renderGuideModal();
 }
 
 /* =================================================
@@ -156,9 +157,10 @@ function renderControls() {
         </button>
       </div>
 
-      <div class="flex justify-between text-xs opacity-70">
+      <div class="flex justify-between text-xs opacity-70 gap-3">
         <button id="themeBtn" class="underline">${isDark ? 'Day Mode' : 'Night Mode'}</button>
         <button id="statsToggle" class="underline">Stats</button>
+        <button id="guideBtn" class="underline">User Guide</button>
       </div>
 
       <div id="statsPanel"
@@ -170,6 +172,118 @@ function renderControls() {
   `;
 
   wireEvents();
+}
+
+function renderGuideModal() {
+  const root = document.getElementById('guideModalRoot');
+  if (!root) return;
+
+  if (!state.guideOpen) {
+    root.innerHTML = '';
+    return;
+  }
+
+  root.innerHTML = `
+    <div id="guideOverlay" class="guide-overlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle" tabindex="-1">
+      <div class="guide-card">
+        <h2 id="guideTitle" class="text-lg font-semibold">How To Use Digital Mantra Japa</h2>
+        <p class="text-sm opacity-80 mt-2">Quick guide for first use and daily practice.</p>
+
+        <div class="guide-section mt-4">
+          <h3 class="font-medium">Main Area</h3>
+          <p class="text-sm opacity-80">Tap the center circle to count one bead. You can also focus the circle and press Enter or Space.</p>
+        </div>
+
+        <div class="guide-section mt-3">
+          <h3 class="font-medium">Counter And Mala</h3>
+          <p class="text-sm opacity-80">Beads increase until your selected mala goal is reached. At completion, bead count resets to 0 and mala count increases by 1.</p>
+        </div>
+
+        <div class="guide-section mt-3">
+          <h3 class="font-medium">Buttons And Controls</h3>
+          <p class="text-sm opacity-80">Mantra: choose or add custom mantra. Mala goal: 11, 21, 54, or 108. Lock: prevents accidental settings changes. Reset: clears current session beads and malas only. Theme: switch day/night mode. Stats: show mantra-wise time and completed malas. User Guide: reopen this guide anytime.</p>
+        </div>
+
+        <div class="guide-section mt-3">
+          <h3 class="font-medium">Session Timer</h3>
+          <p class="text-sm opacity-80">Timer starts on your first tap and records chanting duration per mantra session.</p>
+        </div>
+
+        <div class="guide-section mt-3">
+          <h3 class="font-medium">Data And Privacy</h3>
+          <p class="text-sm opacity-80">All data stays in your browser local storage. No sign-in, no cloud sync.</p>
+        </div>
+
+        <label class="guide-checkbox mt-4">
+          <input id="guideDismissCheckbox" type="checkbox" />
+          <span>Do not show this guide on startup</span>
+        </label>
+
+        <div class="mt-5 flex justify-end">
+          <button id="closeGuideBtn" class="px-4 py-2 rounded bg-wood text-white">Start Chanting</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  wireGuideEvents();
+}
+
+function closeGuide() {
+  const shouldDismiss = document.getElementById('guideDismissCheckbox')?.checked;
+  setGuideDismissed(Boolean(shouldDismiss));
+  state.guideOpen = false;
+  renderUI();
+}
+
+function wireGuideEvents() {
+  const overlay = document.getElementById('guideOverlay');
+  const closeBtn = document.getElementById('closeGuideBtn');
+
+  if (!overlay || !closeBtn) return;
+
+  const focusableSelector = [
+    'button',
+    'a[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(',');
+
+  const focusables = Array.from(overlay.querySelectorAll(focusableSelector));
+  const firstFocusable = focusables[0] || closeBtn;
+  const lastFocusable = focusables[focusables.length - 1] || closeBtn;
+
+  firstFocusable.focus();
+
+  closeBtn.addEventListener('click', closeGuide);
+
+  overlay.addEventListener('click', (event) => {
+    if (event.target.id !== 'guideOverlay') return;
+    closeGuide();
+  });
+
+  overlay.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeGuide();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    if (event.shiftKey && document.activeElement === firstFocusable) {
+      event.preventDefault();
+      lastFocusable.focus();
+      return;
+    }
+
+    if (!event.shiftKey && document.activeElement === lastFocusable) {
+      event.preventDefault();
+      firstFocusable.focus();
+    }
+  });
 }
 
 /* =================================================
@@ -242,6 +356,13 @@ function wireEvents() {
   document.getElementById('statsToggle')
     .addEventListener('click', () => {
       state.statsOpen = !state.statsOpen;
+      renderUI();
+    });
+
+  document.getElementById('guideBtn')
+    .addEventListener('click', () => {
+      setGuideDismissed(false);
+      state.guideOpen = true;
       renderUI();
     });
 }

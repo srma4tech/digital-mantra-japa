@@ -3,6 +3,8 @@
   return Number.isFinite(value) && value >= 0 ? value : fallback;
 }
 
+const guideDismissed = localStorage.getItem('guideDismissed') === 'true';
+
 export const state = {
   beads: getNumber('beads', 0),
   malas: getNumber('malas', 0),
@@ -15,7 +17,8 @@ export const state = {
   locked: false,
   sessionStart: null,
   sessionActive: false,
-  statsOpen: false
+  statsOpen: false,
+  guideOpen: !guideDismissed
 };
 
 export function persistState() {
@@ -24,6 +27,10 @@ export function persistState() {
   localStorage.setItem('lifetime', state.lifetime);
   localStorage.setItem('activeMantra', state.mantra);
   localStorage.setItem('malaGoal', state.malaGoal);
+}
+
+export function setGuideDismissed(value) {
+  localStorage.setItem('guideDismissed', value ? 'true' : 'false');
 }
 
 export function resetSessionState() {
