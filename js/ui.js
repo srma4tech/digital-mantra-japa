@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ui.js
  * -------------------------------------------------
  * UI rendering only
@@ -17,14 +17,12 @@ import { toggleTheme } from './utils.js';
 import { stopAndRecordSession } from './timer.js';
 import { initAnalytics, trackEvent } from './analytics.js';
 
-/* =================================================
-   CIRCLE GEOMETRY (LOCKED)
-================================================= */
-
 const VIEWBOX = 240;
 const RADIUS = 104;
 const STROKE = 12;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+let lastGuideTrigger = null;
 
 function escapeHTML(value) {
   return String(value)
@@ -35,33 +33,30 @@ function escapeHTML(value) {
     .replaceAll("'", '&#39;');
 }
 
-/* =================================================
-   PUBLIC RENDER
-================================================= */
-
 export function renderUI() {
   renderTapArea();
   renderControls();
   renderGuideModal();
 }
 
-/* =================================================
-   TAP AREA (PROGRESS CIRCLE)
-================================================= */
-
 function renderTapArea() {
   const progress =
     CIRCUMFERENCE -
     (state.beads / state.malaGoal) * CIRCUMFERENCE;
 
+  const tapStatus = state.locked
+    ? 'Counter is locked. Unlock to continue counting.'
+    : 'Tap or press Enter or Space to count one bead.';
+  const tapButtonLabel = `${state.beads} of ${state.malaGoal}. ${state.mantra}. Mala ${state.malas}.`;
+
   document.getElementById('tapArea').innerHTML = `
     <div
-      class="
-        relative
-        w-[70vw] h-[70vw]
-        max-w-[360px] max-h-[360px]
-        min-w-[260px] min-h-[260px]
-      "
+      id="tapButton"
+      role="button"
+      tabindex="0"
+      aria-disabled="${state.locked ? 'true' : 'false'}"
+      aria-label="${escapeHTML(tapButtonLabel)}"
+      class="tap-button relative w-[70vw] h-[70vw] max-w-[360px] max-h-[360px] min-w-[260px] min-h-[260px]"
     >
       <svg
         viewBox="0 0 ${VIEWBOX} ${VIEWBOX}"
@@ -90,38 +85,22 @@ function renderTapArea() {
         />
       </svg>
 
-      <div
-        class="
-          absolute inset-0
-          flex flex-col
-          items-center justify-center
-          text-center
-          px-4
-        "
-      >
-        <div class="text-5xl sm:text-6xl font-semibold">
-          ${state.beads}
-        </div>
+      <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+        <div class="text-5xl sm:text-6xl font-semibold">${state.beads}</div>
 
-        <div class="text-xs opacity-60 mt-1">
-          of ${state.malaGoal}
-        </div>
+        <div id="tapButtonCount" class="text-xs opacity-60 mt-1">of ${state.malaGoal}</div>
 
-        <div class="mt-4 text-base font-medium tracking-wide">
-          ${escapeHTML(state.mantra)}
-        </div>
+        <div id="tapButtonMantra" class="mt-4 text-base font-medium tracking-wide">${escapeHTML(state.mantra)}</div>
 
-        <div class="mt-2 text-xs opacity-50 tracking-wide">
-          Mala ${state.malas}
-        </div>
+        <div class="mt-2 text-xs opacity-50 tracking-wide">Mala ${state.malas}</div>
+      </div>
+
+      <div class="sr-only" aria-live="polite">
+        Beads ${state.beads} of ${state.malaGoal}. Mala count ${state.malas}. ${tapStatus}
       </div>
     </div>
   `;
 }
-
-/* =================================================
-   CONTROLS
-================================================= */
 
 function renderControls() {
   const mantras = getMantras();
@@ -131,40 +110,46 @@ function renderControls() {
   document.getElementById('controls').innerHTML = `
     <div class="space-y-4 text-sm opacity-90">
 
-      <select id="mantraSelect" class="w-full p-2 rounded border">
-        ${mantras.map(m =>
-          `<option ${m === state.mantra ? 'selected' : ''}>${escapeHTML(m)}</option>`
-        ).join('')}
-        <option value="__custom">+ Add Custom Mantra</option>
-      </select>
+      <div>
+        <label for="mantraSelect" class="sr-only">Select mantra</label>
+        <select id="mantraSelect" class="w-full p-2 rounded border" aria-label="Select mantra">
+          ${mantras.map(m =>
+            `<option ${m === state.mantra ? 'selected' : ''}>${escapeHTML(m)}</option>`
+          ).join('')}
+          <option value="__custom">+ Add Custom Mantra</option>
+        </select>
+      </div>
 
-      <select id="malaGoalSelect" class="w-full p-2 rounded border">
-        ${[11, 21, 54, 108].map(n =>
-          `<option ${n === state.malaGoal ? 'selected' : ''}>${n} beads</option>`
-        ).join('')}
-      </select>
+      <div>
+        <label for="malaGoalSelect" class="sr-only">Select mala bead target</label>
+        <select id="malaGoalSelect" class="w-full p-2 rounded border" aria-label="Select mala bead target">
+          ${[11, 21, 54, 108].map(n =>
+            `<option ${n === state.malaGoal ? 'selected' : ''}>${n} beads</option>`
+          ).join('')}
+        </select>
+      </div>
 
       <div class="flex justify-between opacity-80">
         <span>Lifetime Japa</span>
-        <span>${state.lifetime}</span>
+        <span aria-live="polite">${state.lifetime}</span>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3">
-        <button id="lockBtn"
+        <button id="lockBtn" type="button" aria-pressed="${state.locked ? 'true' : 'false'}"
           class="flex-1 py-2 rounded bg-wood text-white opacity-90">
           ${state.locked ? 'Locked' : 'Unlocked'}
         </button>
 
-        <button id="resetBtn"
-          class="flex-1 py-2 rounded border opacity-60 hover:opacity-90">
+        <button id="resetBtn" type="button"
+          class="flex-1 py-2 rounded border opacity-80 hover:opacity-100">
           Reset
         </button>
       </div>
 
-      <div class="flex justify-between text-xs opacity-70 gap-3">
-        <button id="themeBtn" class="underline">${isDark ? 'Day Mode' : 'Night Mode'}</button>
-        <button id="statsToggle" class="underline">Stats</button>
-        <button id="guideBtn" class="underline">User Guide</button>
+      <div class="flex justify-between text-xs opacity-80 gap-3">
+        <button id="themeBtn" type="button" class="underline" aria-pressed="${isDark ? 'true' : 'false'}">${isDark ? 'Day Mode' : 'Night Mode'}</button>
+        <button id="statsToggle" type="button" class="underline" aria-expanded="${state.statsOpen ? 'true' : 'false'}" aria-controls="statsPanel">Stats</button>
+        <button id="guideBtn" type="button" class="underline">User Guide</button>
       </div>
 
       <div id="statsPanel"
@@ -188,10 +173,13 @@ function renderGuideModal() {
   }
 
   root.innerHTML = `
-    <div id="guideOverlay" class="guide-overlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle" tabindex="-1">
+    <div id="guideOverlay" class="guide-overlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle" aria-describedby="guideDesc" tabindex="-1">
       <div class="guide-card">
-        <h2 id="guideTitle" class="text-lg font-semibold">How To Use Digital Mantra Japa</h2>
-        <p class="text-sm opacity-80 mt-2">Quick guide for first use and daily practice.</p>
+        <div class="flex justify-between items-start gap-3">
+          <h2 id="guideTitle" class="text-lg font-semibold">How To Use Digital Mantra Japa</h2>
+          <button id="closeGuideIconBtn" type="button" class="guide-close" aria-label="Close guide">Close</button>
+        </div>
+        <p id="guideDesc" class="text-sm opacity-80 mt-2">Quick guide for first use and daily practice.</p>
 
         <div class="guide-section mt-4">
           <h3 class="font-medium">Main Area</h3>
@@ -229,7 +217,7 @@ function renderGuideModal() {
         </label>
 
         <div class="mt-5 flex justify-end">
-          <button id="closeGuideBtn" class="px-4 py-2 rounded bg-wood text-white">Start Chanting</button>
+          <button id="closeGuideBtn" type="button" class="px-4 py-2 rounded bg-wood text-white">Start Chanting</button>
         </div>
       </div>
     </div>
@@ -255,11 +243,16 @@ function closeGuide() {
     analytics_enabled: Boolean(analyticsOptIn)
   });
   renderUI();
+
+  if (lastGuideTrigger?.focus) {
+    lastGuideTrigger.focus();
+  }
 }
 
 function wireGuideEvents() {
   const overlay = document.getElementById('guideOverlay');
   const closeBtn = document.getElementById('closeGuideBtn');
+  const closeIconBtn = document.getElementById('closeGuideIconBtn');
 
   if (!overlay || !closeBtn) return;
 
@@ -276,9 +269,12 @@ function wireGuideEvents() {
   const firstFocusable = focusables[0] || closeBtn;
   const lastFocusable = focusables[focusables.length - 1] || closeBtn;
 
-  firstFocusable.focus();
+  requestAnimationFrame(() => {
+    firstFocusable.focus({ preventScroll: true });
+  });
 
   closeBtn.addEventListener('click', closeGuide);
+  closeIconBtn?.addEventListener('click', closeGuide);
 
   overlay.addEventListener('click', (event) => {
     if (event.target.id !== 'guideOverlay') return;
@@ -307,19 +303,15 @@ function wireGuideEvents() {
   });
 }
 
-/* =================================================
-   STATS
-================================================= */
-
 function renderStats(stats) {
   if (!Object.keys(stats).length) {
-    return `<div class="opacity-60">No stats yet</div>`;
+    return `<div class="opacity-70">No stats yet</div>`;
   }
 
   return Object.entries(stats).map(([mantra, data]) => `
     <div>
       <div class="font-medium">${escapeHTML(mantra)}</div>
-      <div class="text-xs opacity-70">
+      <div class="text-xs opacity-80">
         Malas: ${data.malas} | Time: ${formatTime(data.timeMs)}
       </div>
     </div>
@@ -332,10 +324,6 @@ function formatTime(ms) {
   }
   return `${Math.floor(ms / 60000)} min`;
 }
-
-/* =================================================
-   EVENTS
-================================================= */
 
 function wireEvents() {
   document.getElementById('mantraSelect')
@@ -386,10 +374,12 @@ function wireEvents() {
     });
 
   document.getElementById('guideBtn')
-    .addEventListener('click', () => {
+    .addEventListener('click', (event) => {
+      lastGuideTrigger = event.currentTarget;
       setGuideDismissed(false);
       state.guideOpen = true;
       trackEvent('guide_opened');
       renderUI();
     });
 }
+

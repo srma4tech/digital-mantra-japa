@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'mantra-japa-v3';
+﻿const CACHE_NAME = 'mantra-japa-v4';
 
 const CORE_ASSETS = [
   './',
@@ -80,3 +80,4 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+
