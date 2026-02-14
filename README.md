@@ -1,118 +1,54 @@
-# 🕉️ Digital Mantra Japa & Naam Simran
+﻿# Digital Mantra Japa and Naam Simran
 
-A minimalist, distraction-free **digital japa mala** designed for focused mantra chanting, naam simran, and daily spiritual practice.
+A minimalist digital japa mala for focused mantra chanting and naam simran.
 
-🔗 **Live App**  
-👉 https://srma4tech.github.io/digital-mantra-japa/
+Live app:
+https://srma4tech.github.io/digital-mantra-japa/
 
----
+## Features
 
-## 🌿 Purpose & Philosophy
+- Bead counter increments on each tap (or Enter/Space)
+- Configurable mala size: 11 / 21 / 54 / 108
+- Automatic mala completion tracking
+- Session timer starts on first tap
+- Lock mode protects settings (chanting stays active)
+- Light and dark theme
+- Per-mantra local stats (malas and time)
+- PWA support with offline cache
 
-This application is built with a **spiritual-first mindset**, not as a typical counter app.
+## Notes
 
-Core principles:
+- All user data is stored locally in browser localStorage.
+- No backend, no analytics, no account.
+- Tailwind CSS is loaded from CDN and also cached by service worker after first load.
 
-- Single-point focus on chanting  
-- Minimal UI, no distractions  
-- Offline-first, privacy-respecting  
-- Discipline-oriented (complete the mala, then stop)
+## Tech stack
 
-It is intended for:
-- Mantra Japa  
-- Naam Simran  
-- Silent chanting with eyes closed  
-- Consistent daily spiritual practice  
+- HTML, CSS, vanilla JavaScript
+- Tailwind CSS (CDN)
+- Service Worker + Web App Manifest
+- localStorage persistence
 
----
-
-## ✨ Key Features
-
-### 🔢 Japa Counter
-- Bead counter increments on every tap
-- Configurable mala sizes: **11 / 21 / 54 / 108**
-- Mala count increases automatically after completion
-
-### ⏱ Session Timer
-- Starts automatically on the **first tap**
-- Tracks chanting duration per session
-- Designed to stop **only after mala completion** (user intent)
-
-### 🔒 Lock Mode (Focus Protection)
-- Lock affects **only settings**, not chanting
-- Prevents accidental changes to:
-  - Mantra selection
-  - Mala goal
-  - Reset / Stop actions
-- Tap area remains **fully active at all times**
-
-### 🌗 Light & Dark Mode
-- Warm, devotional light mode
-- Soft, eye-friendly dark mode
-- Suitable for long chanting sessions
-
-### 📊 Stats (Local Only)
-- Lifetime japa count
-- Per-mantra session tracking
-- Stored **only in browser localStorage**
-- No cloud sync, no analytics
-
-### 📱 Responsive & Offline
-- Works on mobile, tablet, and desktop
-- Installable as a Progressive Web App (PWA)
-- Fully functional offline
-
----
-
-## 🧘 Recommended Usage Flow
-
-1. Select your **Mantra**
-2. Select **Mala size**
-3. (Optional) Enable **Lock**
-4. Begin chanting by tapping the center
-5. Complete the full mala
-6. Stop the session consciously
-
-This mirrors **traditional japa discipline**.
-
----
-
-## 🛠️ Technology Stack
-
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Styling**: Tailwind CSS (CDN) + Custom CSS
-- **State Management**: Browser `localStorage`
-- **Offline Support**: Service Worker (PWA)
-- **Hosting**: GitHub Pages
-
-No frameworks.  
-No backend.  
-No build step.
-
----
-
-## 📂 Project Structure
+## Project structure
 
 ```text
 digital-mantra-japa/
-│
-├── index.html
-├── README.md
-├── manifest.json
-├── service-worker.js
-│
-├── css/
-│   └── styles.css
-│
-├── js/
-│   ├── app.js
-│   ├── ui.js
-│   ├── state.js
-│   ├── timer.js
-│   ├── stats.js
-│   ├── mantra.js
-│   └── utils.js
-│
-└── assets/
-    ├── icons/
-    └── audio/
+|-- index.html
+|-- README.md
+|-- manifest.json
+|-- service-worker.js
+|-- css/
+|   `-- styles.css
+|-- js/
+|   |-- app.js
+|   |-- ui.js
+|   |-- state.js
+|   |-- counter.js
+|   |-- timer.js
+|   |-- stats.js
+|   |-- mantra.js
+|   `-- utils.js
+`-- assets/
+    |-- icons/
+    `-- audio/
+```

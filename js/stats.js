@@ -1,7 +1,15 @@
-const STORAGE_KEY = 'mantraStats';
+﻿const STORAGE_KEY = 'mantraStats';
 
 function getStats() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return {};
+
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
 }
 
 function saveStats(stats) {

@@ -1,15 +1,21 @@
+﻿function getNumber(key, fallback) {
+  const value = Number(localStorage.getItem(key));
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
 export const state = {
-  beads: Number(localStorage.getItem('beads')) || 0,
-  malas: Number(localStorage.getItem('malas')) || 0,
-  lifetime: Number(localStorage.getItem('lifetime')) || 0,
+  beads: getNumber('beads', 0),
+  malas: getNumber('malas', 0),
+  lifetime: getNumber('lifetime', 0),
 
   mantra: localStorage.getItem('activeMantra') || 'Om Namah Shivaya',
 
-  malaGoal: Number(localStorage.getItem('malaGoal')) || 108,
+  malaGoal: getNumber('malaGoal', 108) || 108,
 
   locked: false,
   sessionStart: null,
-  sessionActive: false
+  sessionActive: false,
+  statsOpen: false
 };
 
 export function persistState() {

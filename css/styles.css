@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    THEME VARIABLES
 ========================================================= */
 
@@ -33,7 +33,6 @@
   --text-primary: #F5E9C8;
   --text-secondary: rgba(245, 233, 200, 0.6);
 
-  /* Softer ring tones */
   --ring-track: rgba(245, 233, 200, 0.35);
   --ring-progress: #F59E0B;
 
@@ -59,6 +58,12 @@ body {
 #tapArea {
   display: grid;
   place-items: center;
+}
+
+#tapArea:focus-visible {
+  outline: 2px solid var(--ring-progress);
+  outline-offset: 6px;
+  border-radius: 0.75rem;
 }
 
 /* =========================================================
@@ -107,6 +112,16 @@ select:focus,
 button:focus {
   outline: none;
   border-color: var(--ring-progress);
+}
+
+select:disabled,
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bg-wood {
+  background-color: #92400e;
 }
 
 /* =========================================================

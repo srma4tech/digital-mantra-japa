@@ -1,4 +1,4 @@
-import { state } from './state.js';
+﻿import { state } from './state.js';
 import { recordSessionTime } from './stats.js';
 
 let timerInterval = null;
@@ -12,7 +12,9 @@ export function startSessionTimer(element) {
   state.sessionStart = Date.now();
   state.sessionActive = true;
 
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
+    if (!state.sessionStart) return;
     const diff = Date.now() - state.sessionStart;
     element.textContent = formatSessionTime(diff);
   }, 1000);
@@ -23,10 +25,6 @@ export function startSessionTimer(element) {
  */
 export function resetSessionTimer(element) {
   stopAndRecordSession();
-
-  clearInterval(timerInterval);
-  timerInterval = null;
-
   element.textContent = 'Session: 00:00:00';
 }
 
@@ -45,6 +43,9 @@ export function stopAndRecordSession() {
 
   state.sessionStart = null;
   state.sessionActive = false;
+
+  clearInterval(timerInterval);
+  timerInterval = null;
 }
 
 /**

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ui.js
  * -------------------------------------------------
  * UI rendering only
@@ -19,6 +19,15 @@ const VIEWBOX = 240;
 const RADIUS = 104;
 const STROKE = 12;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
 
 /* =================================================
    PUBLIC RENDER
@@ -52,7 +61,6 @@ function renderTapArea() {
         class="w-full h-full -rotate-90"
         aria-hidden="true"
       >
-        <!-- Track -->
         <circle
           cx="${VIEWBOX / 2}"
           cy="${VIEWBOX / 2}"
@@ -62,7 +70,6 @@ function renderTapArea() {
           fill="none"
         />
 
-        <!-- Progress -->
         <circle
           cx="${VIEWBOX / 2}"
           cy="${VIEWBOX / 2}"
@@ -76,7 +83,6 @@ function renderTapArea() {
         />
       </svg>
 
-      <!-- Center Content -->
       <div
         class="
           absolute inset-0
@@ -95,7 +101,7 @@ function renderTapArea() {
         </div>
 
         <div class="mt-4 text-base font-medium tracking-wide">
-          ${state.mantra}
+          ${escapeHTML(state.mantra)}
         </div>
 
         <div class="mt-2 text-xs opacity-50 tracking-wide">
@@ -113,18 +119,20 @@ function renderTapArea() {
 function renderControls() {
   const mantras = getMantras();
   const stats = getAllStats();
+  const isDark = document.documentElement.classList.contains('dark');
+  const controlsDisabled = state.locked ? 'disabled' : '';
 
   document.getElementById('controls').innerHTML = `
     <div class="space-y-4 text-sm opacity-90">
 
-      <select id="mantraSelect" class="w-full p-2 rounded border">
+      <select id="mantraSelect" class="w-full p-2 rounded border" ${controlsDisabled}>
         ${mantras.map(m =>
-          `<option ${m === state.mantra ? 'selected' : ''}>${m}</option>`
+          `<option ${m === state.mantra ? 'selected' : ''}>${escapeHTML(m)}</option>`
         ).join('')}
         <option value="__custom">+ Add Custom Mantra</option>
       </select>
 
-      <select id="malaGoalSelect" class="w-full p-2 rounded border">
+      <select id="malaGoalSelect" class="w-full p-2 rounded border" ${controlsDisabled}>
         ${[11, 21, 54, 108].map(n =>
           `<option ${n === state.malaGoal ? 'selected' : ''}>${n} beads</option>`
         ).join('')}
@@ -138,22 +146,23 @@ function renderControls() {
       <div class="flex flex-col sm:flex-row gap-3">
         <button id="lockBtn"
           class="flex-1 py-2 rounded bg-wood text-white opacity-90">
-          ${state.locked ? '🔒 Locked' : '🔓 Unlocked'}
+          ${state.locked ? 'Locked' : 'Unlocked'}
         </button>
 
         <button id="resetBtn"
-          class="flex-1 py-2 rounded border opacity-60 hover:opacity-90">
+          class="flex-1 py-2 rounded border opacity-60 hover:opacity-90"
+          ${controlsDisabled}>
           Reset
         </button>
       </div>
 
       <div class="flex justify-between text-xs opacity-70">
-        <button id="themeBtn" class="underline">Night Mode</button>
+        <button id="themeBtn" class="underline">${isDark ? 'Day Mode' : 'Night Mode'}</button>
         <button id="statsToggle" class="underline">Stats</button>
       </div>
 
       <div id="statsPanel"
-        class="hidden border-t pt-3 space-y-2">
+        class="${state.statsOpen ? '' : 'hidden'} border-t pt-3 space-y-2">
         ${renderStats(stats)}
       </div>
 
@@ -174,9 +183,9 @@ function renderStats(stats) {
 
   return Object.entries(stats).map(([mantra, data]) => `
     <div>
-      <div class="font-medium">${mantra}</div>
+      <div class="font-medium">${escapeHTML(mantra)}</div>
       <div class="text-xs opacity-70">
-        Malas: ${data.malas} · Time: ${formatTime(data.timeMs)}
+        Malas: ${data.malas} | Time: ${formatTime(data.timeMs)}
       </div>
     </div>
   `).join('');
@@ -194,16 +203,18 @@ function formatTime(ms) {
 ================================================= */
 
 function wireEvents() {
-
   document.getElementById('mantraSelect')
     .addEventListener('change', e => {
+      if (state.locked) return;
       stopAndRecordSession();
 
       if (e.target.value === '__custom') {
         const input = prompt('Enter your mantra');
-        if (input) {
-          addMantra(input.trim());
-          state.mantra = input.trim();
+        if (input !== null) {
+          const { mantras, added } = addMantra(input);
+          if (added) {
+            state.mantra = mantras[mantras.length - 1];
+          }
         }
       } else {
         state.mantra = e.target.value;
@@ -215,6 +226,7 @@ function wireEvents() {
 
   document.getElementById('malaGoalSelect')
     .addEventListener('change', e => {
+      if (state.locked) return;
       stopAndRecordSession();
       state.malaGoal = Number(e.target.value);
       persistState();
@@ -222,11 +234,14 @@ function wireEvents() {
     });
 
   document.getElementById('themeBtn')
-    .addEventListener('click', toggleTheme);
+    .addEventListener('click', () => {
+      toggleTheme();
+      renderUI();
+    });
 
   document.getElementById('statsToggle')
     .addEventListener('click', () => {
-      document.getElementById('statsPanel')
-        .classList.toggle('hidden');
+      state.statsOpen = !state.statsOpen;
+      renderUI();
     });
 }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * app.js
  * -----------------------------------------
  * Application bootstrap & orchestration
@@ -21,17 +21,23 @@ const timerEl = document.getElementById('sessionTimer');
 // Initial render (timer intentionally NOT started)
 renderUI();
 
-/* ---------------------------
-   Tap Area
----------------------------- */
-tapArea.addEventListener('click', () => {
-  if (state.locked) return;
-
+function handleJapaTap() {
   if (!state.sessionActive) {
     startSessionTimer(timerEl);
   }
 
   incrementJapa(bellSound);
+}
+
+/* ---------------------------
+   Tap Area
+---------------------------- */
+tapArea.addEventListener('click', handleJapaTap);
+tapArea.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    handleJapaTap();
+  }
 });
 
 /* ---------------------------

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -18,18 +18,13 @@
   <!-- PWA -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- Fallback favicon -->
-  <link rel="icon" href="data:," />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./assets/icons/favicon-32.png" />
 </head>
 
 <body>
 
-  <!-- ==================================================
-       APP SHELL (GRID-BASED LAYOUT)
-  =================================================== -->
   <div id="appShell">
-
-    <!-- ========== HEADER ========== -->
     <header class="py-4 text-center">
       <h1 class="text-lg font-medium tracking-wide">
         Digital Mantra Japa
@@ -42,15 +37,16 @@
       </p>
     </header>
 
-    <!-- ========== MEDITATION CANVAS ========== -->
     <main
       id="tapArea"
       class="select-none px-4"
+      role="button"
+      tabindex="0"
+      aria-label="Tap or press Enter/Space to count one bead"
     >
       <!-- Rendered by ui.js -->
     </main>
 
-    <!-- ========== CONTROLS ========== -->
     <footer
       id="controls"
       class="
@@ -67,17 +63,14 @@
 
   </div>
 
-  <!-- ========== AUDIO ========== -->
   <audio
     id="bellSound"
     preload="auto"
     src="./assets/audio/bell.mp3"
   ></audio>
 
-  <!-- ========== APP SCRIPT ========== -->
   <script type="module" src="./js/app.js"></script>
 
-  <!-- ========== SERVICE WORKER ========== -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
