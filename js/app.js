@@ -22,6 +22,8 @@ const timerEl = document.getElementById('sessionTimer');
 renderUI();
 
 function handleJapaTap() {
+  if (state.guideOpen) return;
+
   if (!state.sessionActive) {
     startSessionTimer(timerEl);
   }
