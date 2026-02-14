@@ -11,15 +11,22 @@ https://srma4tech.github.io/digital-mantra-japa/
 - Configurable mala size: 11 / 21 / 54 / 108
 - Automatic mala completion tracking
 - Session timer starts on first tap
-- Lock mode protects settings (chanting stays active)
+- Lock mode prevents accidental tap counting
 - Light and dark theme
 - Per-mantra local stats (malas and time)
 - PWA support with offline cache
+- Optional Google Analytics insights (opt-in)
+
+## Analytics setup
+
+1. Open `index.html`.
+2. Set `window.APP_CONFIG.gaMeasurementId` to your GA4 Measurement ID (example: `G-ABC123XYZ9`).
+3. Open the app and enable `Allow anonymous usage analytics` in the guide.
 
 ## Notes
 
-- All user data is stored locally in browser localStorage.
-- No backend, no analytics, no account.
+- Core user data is stored locally in browser localStorage.
+- Analytics is disabled by default and sent only if user opts in.
 - Tailwind CSS is loaded from CDN and also cached by service worker after first load.
 
 ## Tech stack
@@ -28,6 +35,7 @@ https://srma4tech.github.io/digital-mantra-japa/
 - Tailwind CSS (CDN)
 - Service Worker + Web App Manifest
 - localStorage persistence
+- Google Analytics 4 (optional)
 
 ## Project structure
 
@@ -47,6 +55,7 @@ digital-mantra-japa/
 |   |-- timer.js
 |   |-- stats.js
 |   |-- mantra.js
+|   |-- analytics.js
 |   `-- utils.js
 `-- assets/
     |-- icons/

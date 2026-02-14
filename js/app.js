@@ -9,9 +9,11 @@ import { incrementJapa } from './counter.js';
 import { state, resetSessionState } from './state.js';
 import { startSessionTimer, resetSessionTimer } from './timer.js';
 import { loadTheme } from './utils.js';
+import { initAnalytics, trackEvent } from './analytics.js';
 
 // Load persisted theme BEFORE render
 loadTheme();
+initAnalytics();
 
 // DOM references
 const tapArea = document.getElementById('tapArea');
@@ -27,6 +29,10 @@ function handleJapaTap() {
 
   if (!state.sessionActive) {
     startSessionTimer(timerEl);
+    trackEvent('session_started', {
+      mantra: state.mantra,
+      mala_goal: state.malaGoal
+    });
   }
 
   incrementJapa(bellSound);
@@ -50,6 +56,7 @@ document.addEventListener('click', (event) => {
 
   if (event.target.id === 'lockBtn') {
     state.locked = !state.locked;
+    trackEvent('lock_toggled', { locked: state.locked });
     renderUI();
     return;
   }
@@ -64,6 +71,7 @@ document.addEventListener('click', (event) => {
 
     resetSessionState();
     resetSessionTimer(timerEl);
+    trackEvent('session_reset');
     renderUI();
   }
 });

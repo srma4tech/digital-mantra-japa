@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'mantra-japa-v2';
+﻿const CACHE_NAME = 'mantra-japa-v3';
 
 const CORE_ASSETS = [
   './',
@@ -13,6 +13,7 @@ const CORE_ASSETS = [
   './js/utils.js',
   './js/stats.js',
   './js/mantra.js',
+  './js/analytics.js',
   './assets/icons/favicon-32.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
