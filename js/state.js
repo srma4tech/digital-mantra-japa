@@ -22,6 +22,11 @@ export const state = {
   analyticsEnabled: localStorage.getItem('analyticsEnabled') === 'true'
 };
 
+export function clearSessionProgressFromStorage() {
+  localStorage.removeItem('beads');
+  localStorage.removeItem('malas');
+}
+
 export function persistState() {
   localStorage.setItem('beads', state.beads);
   localStorage.setItem('malas', state.malas);
@@ -45,4 +50,5 @@ export function resetSessionState() {
   state.malas = 0;
   state.sessionStart = null;
   state.sessionActive = false;
+  clearSessionProgressFromStorage();
 }

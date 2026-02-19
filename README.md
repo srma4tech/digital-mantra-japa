@@ -11,9 +11,10 @@ https://srma4tech.github.io/digital-mantra-japa/
 - Configurable mala size: 11 / 21 / 54 / 108
 - Automatic mala completion tracking
 - Session timer starts on first tap
+- Stop After Mala button (enabled only on completed mala boundary)
 - Lock mode prevents accidental tap counting
 - Light and dark theme
-- Per-mantra local stats (malas and time)
+- Per-mantra local stats (malas and time, including `0 sec` when no time is recorded)
 - PWA support with offline cache
 - Optional Google Analytics insights (opt-in)
 
@@ -26,6 +27,7 @@ https://srma4tech.github.io/digital-mantra-japa/
 ## Notes
 
 - Core user data is stored locally in browser localStorage.
+- `Reset` and `Stop After Mala` clear current session beads/malas from localStorage, while lifetime count and mantra stats remain.
 - Analytics is disabled by default and sent only if user opts in.
 - Tailwind CSS is loaded from CDN and also cached by service worker after first load.
 
