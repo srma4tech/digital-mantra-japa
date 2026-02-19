@@ -101,6 +101,19 @@ button {
 
 select {
   padding: 0.6rem;
+  background-color: var(--surface-bg);
+}
+
+select option,
+select optgroup {
+  background-color: #FFF6C3;
+  color: #78350F;
+}
+
+.dark select option,
+.dark select optgroup {
+  background-color: #1E1915;
+  color: #F5E9C8;
 }
 
 button {

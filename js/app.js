@@ -75,9 +75,27 @@ document.addEventListener('click', (event) => {
 
     if (!confirmed) return;
 
-    resetSessionState();
     resetSessionTimer(timerEl);
+    resetSessionState();
     trackEvent('session_reset');
+    renderUI();
+    return;
+  }
+
+  if (event.target.id === 'stopBtn') {
+    if (state.malas <= 0 || state.beads !== 0) {
+      return;
+    }
+
+    const completedMalas = state.malas;
+
+    resetSessionTimer(timerEl);
+    resetSessionState();
+
+    trackEvent('session_stopped_after_mala', {
+      completed_malas: completedMalas,
+      mantra: state.mantra
+    });
     renderUI();
   }
 });

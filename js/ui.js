@@ -106,6 +106,7 @@ function renderControls() {
   const mantras = getMantras();
   const stats = getAllStats();
   const isDark = document.documentElement.classList.contains('dark');
+  const canStopSession = state.malas > 0 && state.beads === 0;
 
   document.getElementById('controls').innerHTML = `
     <div class="space-y-4 text-sm opacity-90">
@@ -143,6 +144,13 @@ function renderControls() {
         <button id="resetBtn" type="button"
           class="flex-1 py-2 rounded border opacity-80 hover:opacity-100">
           Reset
+        </button>
+      </div>
+
+      <div>
+        <button id="stopBtn" type="button" ${canStopSession ? '' : 'disabled'}
+          class="w-full py-2 rounded border opacity-80 hover:opacity-100">
+          Stop After Mala
         </button>
       </div>
 
@@ -193,7 +201,7 @@ function renderGuideModal() {
 
         <div class="guide-section mt-3">
           <h3 class="font-medium">Buttons And Controls</h3>
-          <p class="text-sm opacity-80">Mantra: choose or add custom mantra. Mala goal: 11, 21, 54, or 108. Lock: prevents accidental tap counting. Reset: clears current session beads and malas only. Theme: switch day/night mode. Stats: show mantra-wise time and completed malas. User Guide: reopen this guide anytime.</p>
+          <p class="text-sm opacity-80">Mantra: choose or add custom mantra. Mala goal: 11, 21, 54, or 108. Lock: prevents accidental tap counting. Reset: clears current session beads and malas only. Stop After Mala: enabled only after completing a mala, then stops timer and closes the active session. Theme: switch day/night mode. Stats: show mantra-wise time and completed malas. User Guide: reopen this guide anytime.</p>
         </div>
 
         <div class="guide-section mt-3">
@@ -319,10 +327,19 @@ function renderStats(stats) {
 }
 
 function formatTime(ms) {
-  if (ms < 60000) {
-    return `${Math.max(1, Math.floor(ms / 1000))} sec`;
+  const totalSeconds = Math.floor(ms / 1000);
+
+  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) {
+    return '0 sec';
   }
-  return `${Math.floor(ms / 60000)} min`;
+
+  if (totalSeconds < 60) {
+    return `${totalSeconds} sec`;
+  }
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return seconds ? `${minutes} min ${seconds} sec` : `${minutes} min`;
 }
 
 function wireEvents() {
